@@ -1,0 +1,6 @@
+! 1200x900 on a 7.5" panel (~200 dpi): scale fonts up
+Xft.dpi: 120
+Xft.antialias: 1
+Xft.hinting: 1
+Xft.hintstyle: hintslight
+Xft.rgba: none

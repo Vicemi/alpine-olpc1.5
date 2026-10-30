@@ -1,0 +1,5 @@
+
+Alpine Linux para OLPC XO-1.5 - https://github.com/Vicemi/alpine-olpc1.5
+WiFi: icono de red en la barra, o  nmcli device wifi connect "RED" password "CLAVE"
+Instalar programas: doas apk add <paquete>
+

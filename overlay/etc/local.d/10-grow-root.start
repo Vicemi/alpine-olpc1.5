@@ -1,0 +1,11 @@
+#!/bin/sh
+# First boot: grow the root partition (p2) and its ext4 to fill the whole card.
+[ -e /etc/xo-root-grown ] && exit 0
+{
+    puuid=$(sed -n 's/.*root=PARTUUID=\([^ ]*\).*/\1/p' /proc/cmdline)
+    part=$(blkid -t PARTUUID="$puuid" -o device)
+    disk=$(echo "$part" | sed -E 's/p?2$//')
+    echo "grow $part on $disk"
+    growpart "$disk" 2; resize2fs "$part" && touch /etc/xo-root-grown
+} >> /var/log/grow-root.log 2>&1
+exit 0

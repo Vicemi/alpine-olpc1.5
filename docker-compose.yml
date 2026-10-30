@@ -1,0 +1,14 @@
+# 1) docker compose run --rm kernel   -> output/kernel   (~30-60 min)
+# 2) docker compose run --rm image    -> output/alpine-xo15.img.xz
+services:
+  kernel:
+    build: { context: ., dockerfile: kernel/Dockerfile }
+    volumes: [ "./output:/output" ]
+    environment:
+      KVER: "5.15.224"      # 5.15 = last LTS where the OLPC DCON driver is not BROKEN
+      ALPINE_BRANCH: "3.24"
+  image:
+    build: { context: ., dockerfile: Dockerfile }
+    volumes: [ "./output:/output" ]
+    environment:
+      ALPINE_BRANCH: "v3.24"

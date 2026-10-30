@@ -1,0 +1,10 @@
+Theme="default"
+TaskBarClockLeds=0
+TaskBarShowCPUStatus=1
+TaskBarShowMEMStatus=1
+TaskBarShowNetStatus=0
+ShowThemesMenu=0
+TerminalCommand="lxterminal"
+NormalTaskBarFontName="sans-serif:size=11"
+TitleFontName="sans-serif:size=11:bold"
+MenuFontName="sans-serif:size=11"

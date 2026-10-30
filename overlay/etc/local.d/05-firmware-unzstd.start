@@ -1,0 +1,7 @@
+#!/bin/sh
+# Alpine ships firmware as .zst, but kernel 5.15 can only load plain or .xz firmware.
+# Decompress anything new (e.g. after "apk upgrade"); takes effect on next module load/boot.
+find /lib/firmware -name '*.zst' | while read -r f; do
+    zstd -q -d --rm -f "$f" -o "${f%.zst}"
+done
+exit 0

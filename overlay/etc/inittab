@@ -1,0 +1,11 @@
+# /etc/inittab (XO-1.5): autologin "olpc" on tty1, which starts X from ~/.profile
+::sysinit:/sbin/openrc sysinit
+::sysinit:/sbin/openrc boot
+::wait:/sbin/openrc default
+
+tty1::respawn:/sbin/agetty --autologin olpc --noclear 38400 tty1 linux
+tty2::respawn:/sbin/getty 38400 tty2
+tty3::respawn:/sbin/getty 38400 tty3
+
+::ctrlaltdel:/sbin/reboot
+::shutdown:/sbin/openrc shutdown
