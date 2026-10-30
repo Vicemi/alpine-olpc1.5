@@ -47,10 +47,10 @@ for s in hwclock modules sysctl hostname bootmisc syslog seedrng \
 for s in dbus networkmanager chronyd zram-init local;                do run rc-update add $s default; done
 for s in mount-ro killprocs savecache;                               do run rc-update add $s shutdown; done
 
-# User olpc (autologin on tty1 -> startx). Default passwords: olpc / olpc (change them!)
+# User olpc (autologin on tty1 -> startx), password olpc (README says to change it). Root is locked: admin via doas.
 run "adduser -D -s /bin/ash olpc"
 for g in wheel audio video input netdev plugdev; do run "addgroup olpc $g" 2>/dev/null || true; done
-run "echo 'olpc:olpc' | chpasswd && echo 'root:olpc' | chpasswd"
+run "echo 'olpc:olpc' | chpasswd && passwd -l root"
 run "chown -R olpc:olpc /home/olpc"
 ln -sf /usr/share/zoneinfo/America/Montevideo "$R/etc/localtime"
 echo America/Montevideo > "$R/etc/timezone"

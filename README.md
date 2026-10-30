@@ -12,8 +12,8 @@ automático** sin escribir nada en el prompt `ok`.
 | Navegador | Firefox ESR con ajustes para 1 GB de RAM (1 proceso, sin animaciones) |
 | Memoria | swap comprimida en RAM (zram 512 MB, lz4) |
 
-Usuario: **`olpc`**, contraseña **`olpc`** (también la de `root`). Cámbialas con `passwd` y
-`doas passwd root`. Para administrar usa `doas` (p. ej. `doas apk add gimp`).
+Usuario: **`olpc`**, contraseña **`olpc`** — cámbiala con `passwd`. La cuenta `root` está bloqueada:
+para administrar usa `doas` (p. ej. `doas apk add gimp`) con la contraseña de `olpc`.
 
 ## Instalar en la XO
 
