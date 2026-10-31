@@ -1,4 +1,5 @@
-# Labels, not PARTUUID: busybox mount does not understand PARTUUID= (the kernel cmdline does)
-LABEL=xoroot  /      ext4   rw,noatime              0 1
-LABEL=XOBOOT  /boot  vfat   rw,noatime,umask=0022   0 2
-tmpfs         /tmp   tmpfs  nosuid,nodev,size=128M  0 0
+# @..._UUID@ are filled by scripts/make-image.sh (and rewritten by xo-install).
+# UUIDs, not labels: a USB stick and the internal card carry the same labels.
+UUID=@ROOT_UUID@  /      ext4   rw,noatime              0 1
+UUID=@BOOT_UUID@  /boot  vfat   rw,noatime,umask=0022   0 2
+tmpfs             /tmp   tmpfs  nosuid,nodev,size=128M  0 0

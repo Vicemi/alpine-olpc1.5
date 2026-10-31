@@ -28,14 +28,28 @@ arrancar). Ya es tu caso si usabas Puppy.
 
 En el primer arranque la partición raíz se agranda para ocupar toda la tarjeta (unos segundos).
 
+### Instalar en la microSD interna sin sacarla
+
+1. Arranca Alpine desde un pendrive (ver abajo).
+2. Abre la Terminal y ejecuta `doas xo-install`. Muestra los discos con su tamaño y etiquetas
+   (la interna es la de ~16 GB; si tenía Puppy verás la etiqueta `PUPPYXO`), pide el disco destino
+   (p. ej. `/dev/mmcblk0`) y que escribas `BORRAR`.
+3. Copia el sistema que está corriendo (incluidas las redes WiFi guardadas). Al terminar apaga,
+   quita el USB y enciende: arranca solo desde la interna.
+
 ### Probar primero sin tocar la microSD interna
 
 La misma imagen arranca desde **pendrive USB** o desde la **ranura SD externa**: OFW busca
 `\boot\olpc.fth` en este orden: USB (`u:`), SD externa (`ext:`), SD interna (`int:`). Graba un
 pendrive, conéctalo y enciende: arranca desde el pendrive aunque la interna tenga otro sistema.
 
+Algunos pendrives no funcionan por el USB2 de la XO (`dir u:\` da `Can't open directory`). En ese
+caso, desde `ok`: `p2`, luego `dir /pci/usb@10/scsi@0,0/disk:\` (el mismo pendrive por USB1) y, si
+lista `VMLINUZ` y `BOOT`, arranca con `boot /pci/usb@10/scsi@0,0/disk:\boot\olpc.fth`.
+
 ### WiFi
-Clic en el icono de red de la barra → elige la red → contraseña. Desde consola:
+Clic en el icono de red de la barra → elige la red → aparece el diálogo de contraseña. También
+está el botón **WiFi** de la barra (menú de texto `nmtui`), o desde la Terminal:
 `nmcli device wifi connect "MiRed" password "clave"`.
 
 ## Si no arranca solo

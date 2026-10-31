@@ -1,0 +1,4 @@
+#!/bin/sh
+# Run by icewm-session once the desktop is up
+dunst &       # notifications (nm-applet reports connection errors this way)
+nm-applet &

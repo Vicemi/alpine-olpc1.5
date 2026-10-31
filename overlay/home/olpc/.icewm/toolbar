@@ -1,3 +1,4 @@
 prog "Firefox" firefox-esr firefox-esr
 prog "Archivos" folder pcmanfm
 prog "Terminal" utilities-terminal lxterminal
+prog "WiFi" network-wireless lxterminal -e nmtui-connect

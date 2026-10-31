@@ -1,0 +1,60 @@
+#!/bin/sh
+# Copy the running system (e.g. booted from a USB stick) onto another disk, normally the
+# XO's internal microSD, and make it bootable by Open Firmware. Usage: doas xo-install
+set -eu
+[ "$(id -u)" = 0 ] || exec doas "$0" "$@"
+
+rootpuuid=$(sed -n 's/.*root=PARTUUID=\([^ ]*\).*/\1/p' /proc/cmdline)
+rootpart=$(blkid -t PARTUUID="$rootpuuid" -o device)
+rootdisk=$(echo "$rootpart" | sed -E 's/p?2$//')
+
+echo "Sistema actual en: $rootdisk"
+echo "Discos donde se puede instalar:"
+found=
+for d in /sys/block/mmcblk[0-9]* /sys/block/sd[a-z]; do
+    [ -e "$d" ] || continue
+    dev=/dev/${d##*/}
+    [ "$dev" = "$rootdisk" ] && continue
+    labels=$(blkid -s LABEL -o value "$dev"* 2>/dev/null | tr '\n' ' ')
+    echo "  $dev  $(( $(cat "$d/size") / 2048 )) MB  ${labels:+etiquetas: $labels}"
+    found=1
+done
+[ -n "$found" ] || { echo "No hay otro disco."; exit 1; }
+
+printf "Disco destino (ej. /dev/mmcblk0): "; read -r tgt
+[ -b "$tgt" ] && [ "$tgt" != "$rootdisk" ] || { echo "Disco no valido."; exit 1; }
+case "$tgt" in *[0-9]) p1=${tgt}p1; p2=${tgt}p2 ;; *) p1=${tgt}1; p2=${tgt}2 ;; esac
+printf "Se BORRARA todo en %s. Escribe BORRAR para seguir: " "$tgt"; read -r ans
+[ "$ans" = BORRAR ] || { echo "Cancelado."; exit 1; }
+
+for m in $(grep "^$tgt" /proc/mounts | cut -d' ' -f2); do umount "$m"; done
+
+# Same layout as scripts/make-image.sh: p1 FAT32 64 MiB (read by OFW), p2 ext4 rest
+id=$(od -An -N4 -tx4 /dev/urandom | tr -d ' ')
+sfdisk -q --wipe always "$tgt" <<EOF
+label: dos
+label-id: 0x$id
+start=2048, size=131072, type=c, bootable
+type=83
+EOF
+udevadm settle
+mkfs.vfat -F 32 -n XOBOOT "$p1" >/dev/null
+mkfs.ext4 -q -F -L xoroot -O ^orphan_file "$p2"
+
+M=/mnt/xo-install
+mkdir -p $M/src $M/dst
+mount --bind / $M/src     # non-recursive: no /proc, /sys, /dev, /tmp or /boot contents
+mount "$p2" $M/dst
+trap 'umount $M/dst/boot $M/dst $M/src 2>/dev/null' EXIT
+echo ">> Copiando el sistema (varios minutos)..."
+cp -a $M/src/. $M/dst/
+mount "$p1" $M/dst/boot
+cp -r /boot/. $M/dst/boot/   # FAT has no owners: -r, not -a
+
+sed -i "s/root=PARTUUID=[0-9a-f]*-02/root=PARTUUID=$id-02/" $M/dst/boot/boot/olpc.fth
+uuid() { blkid -s UUID -o value "$1"; }
+bootpart=$(echo "$rootpart" | sed 's/2$/1/')
+sed -i "s/$(uuid "$rootpart")/$(uuid "$p2")/; s/$(uuid "$bootpart")/$(uuid "$p1")/" $M/dst/etc/fstab
+touch $M/dst/etc/xo-root-grown   # p2 already fills the disk
+sync
+echo ">> Listo. Apaga, quita el USB y enciende: arrancara desde $tgt."

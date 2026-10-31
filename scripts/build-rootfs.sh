@@ -14,10 +14,10 @@ PKGS="
 alpine-base openrc busybox-openrc agetty doas nano htop tzdata
 e2fsprogs e2fsprogs-extra dosfstools blkid sfdisk cloud-utils-growpart
 eudev udev-init-scripts udev-init-scripts-openrc dbus dbus-openrc
-networkmanager networkmanager-openrc networkmanager-wifi networkmanager-cli wpa_supplicant network-manager-applet
+networkmanager networkmanager-openrc networkmanager-wifi networkmanager-cli networkmanager-tui wpa_supplicant network-manager-applet
 linux-firmware-libertas zstd chrony zram-init zram-init-openrc alsa-utils
 xorg-server xf86-video-fbdev xf86-input-libinput xinit xrdb setxkbmap xset
-font-dejavu adwaita-icon-theme icewm pcmanfm lxterminal
+font-dejavu adwaita-icon-theme dunst icewm pcmanfm lxterminal
 firefox-esr
 "
 

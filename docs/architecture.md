@@ -21,8 +21,9 @@ Linux 5.15 ──root=PARTUUID=<id>-02 rootwait──> ext4 (p2) ──> OpenRC 
   `\vmlinuz` en ese mismo dispositivo, así la misma imagen sirve en USB, SD externa o interna.
 - **Raíz.** Sin initramfs: MMC, ext4, USB-storage y UHCI/EHCI están compilados en el kernel. La raíz
   se identifica por `PARTUUID` (id del disco MBR + número de partición), estable sin importar si la
-  tarjeta es `mmcblk0`, `mmcblk1` o `sda`. En `/etc/fstab` se usan etiquetas (`xoroot`, `XOBOOT`)
-  porque el `mount` de busybox no entiende `PARTUUID=`.
+  tarjeta es `mmcblk0`, `mmcblk1` o `sda`. En `/etc/fstab` se usan UUIDs de sistema de archivos
+  (el `mount` de busybox no entiende `PARTUUID=`; las etiquetas se repiten entre pendrive e interna).
+  Los rellena `make-image.sh` y los reescribe `xo-install`.
 
 ## Imagen
 
@@ -52,6 +53,14 @@ arranque (por si `apk upgrade` trae `.zst` nuevos).
 ## Escritorio y memoria
 
 - X.Org con driver `fbdev` sobre `viafb` (no existe driver KMS para VIA; openchrome no está en Alpine).
-- IceWM (un solo proceso) en vez de XFCE: menos RAM para el navegador.
+- IceWM (un solo proceso) en vez de XFCE: menos RAM para el navegador. `~/.xinitrc` lo lanza con
+  `dbus-run-session`: `nm-applet` consulta el llavero por el bus de sesión antes de mostrar el
+  diálogo de contraseña WiFi, y sin ese bus el diálogo nunca aparece. `~/.icewm/startup` lanza
+  `nm-applet` y `dunst` (notificaciones).
+
+## Instalador
+
+`xo-install` (`overlay/usr/local/sbin`) copia el sistema en marcha a otro disco con el mismo esquema
+de particiones que la imagen, un PARTUUID nuevo en `olpc.fth` y los UUIDs nuevos en `fstab`.
 - Firefox ESR con `config/firefox-xo.js`: un proceso de contenido, sin fission ni animaciones.
 - zram 512 MB lz4 como swap.

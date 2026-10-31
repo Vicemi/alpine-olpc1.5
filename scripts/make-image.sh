@@ -12,19 +12,22 @@ R=$O/rootfs
 rm -rf "$W"; mkdir -p "$W"
 
 PARTUUID="$(od -An -N4 -tx4 /dev/urandom | tr -d ' ')"
+BOOT_ID="$(od -An -N4 -tx4 /dev/urandom | tr -d ' ' | tr a-f A-F)"
+ROOT_UUID="$(cat /proc/sys/kernel/random/uuid)"
+sed "s/@ROOT_UUID@/$ROOT_UUID/; s/@BOOT_UUID@/$(echo "$BOOT_ID" | sed 's/..../&-/')/" "$SRC/overlay/etc/fstab" > "$R/etc/fstab"
 
 BOOT_MB=64
 ROOT_MB=$(( $(du -sm "$R" | cut -f1) * 115 / 100 + 300 ))
 
 # p1: FAT32 boot partition
-mkfs.vfat -F 32 -n XOBOOT -C "$W/boot.img" $((BOOT_MB * 1024)) >/dev/null
+mkfs.vfat -F 32 -n XOBOOT -i "$BOOT_ID" -C "$W/boot.img" $((BOOT_MB * 1024)) >/dev/null
 sed "s/@PARTUUID@/$PARTUUID/" "$SRC/boot/olpc.fth" > "$W/olpc.fth"
 mmd   -i "$W/boot.img" ::/boot
 mcopy -i "$W/boot.img" /output/kernel/vmlinuz ::/vmlinuz
 mcopy -i "$W/boot.img" "$W/olpc.fth" ::/boot/olpc.fth
 
 # p2: ext4 root, filled straight from the directory
-mkfs.ext4 -q -L xoroot -O ^orphan_file -d "$R" "$W/root.img" "${ROOT_MB}M"
+mkfs.ext4 -q -L xoroot -U "$ROOT_UUID" -O ^orphan_file -d "$R" "$W/root.img" "${ROOT_MB}M"
 
 # Disk: MBR with our disk id (=> PARTUUID), p1 active
 IMG=$O/alpine-xo15.img
